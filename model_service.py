@@ -3,25 +3,32 @@ import torch
 import torch.nn as nn
 from torchvision import models, transforms
 from fastapi import FastAPI, UploadFile, File, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from PIL import Image
 
 app = FastAPI(title="Paligatu ML Inference API")
 
-# Mapping dari train_dataset.class_to_idx: {'anorganik': 0, 'b3': 1, 'organik': 2}
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 LABELS = ["ANORGANIK", "B3", "ORGANIK"]
 
-# Inisialisasi device (otomatis deteksi GPU CUDA atau fallback ke CPU)
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+if device.type == "cpu":
+    torch.set_num_threads(1)
 
 def build_model():
     """
     Membangun ulang arsitektur EfficientNet-B0 + custom classifier
     persis seperti saat training di notebook Colab (Paligatu_AI.ipynb).
     """
-    # Gunakan weights=None karena kita akan memuat bobot langsung dari best_model.pth
     m = models.efficientnet_b0(weights=None)
-    
-    # Mengganti classifier standar (1280 -> 1000) dengan custom classifier (1280 -> 256 -> 3)
+
     in_f = m.classifier[1].in_features  # 1280
     m.classifier = nn.Sequential(
         nn.Dropout(0.3),
@@ -49,13 +56,20 @@ try:
 except Exception as e:
     print(f"❌ Gagal memuat model: {str(e)}")
 
-# Preprocessing sesuaikan persis seperti transformasi validasi saat training
 preprocess = transforms.Compose([
     transforms.Resize((224, 224)),
     transforms.ToTensor(),
     transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225]),
 ])
-# ─────────────────────────────────────────────────────────
+
+@app.get("/")
+async def root():
+    """Root endpoint — supaya base URL tidak 404 dan bisa dipakai cek cepat."""
+    return {
+        "service": "Paligatu ML Inference API",
+        "docs": "/docs",
+        "health": "/health",
+    }
 
 @app.get("/health")
 async def health_check():
@@ -70,25 +84,29 @@ async def health_check():
 @app.post("/predict")
 async def predict(file: UploadFile = File(...)):
     """
-    Menerima upload gambar dan mengembalikan prediksi label sampah serta confidence score.
+    Menerima upload gambar dan mengembalikan prediksi label sampah,
+    confidence score, serta probabilitas semua kelas.
     """
     if not model_loaded:
         raise HTTPException(status_code=503, detail="Model belum dimuat. Periksa keberadaan file best_model.pth.")
-        
+
     try:
         content = await file.read()
         img = Image.open(io.BytesIO(content)).convert("RGB")
         x = preprocess(img).unsqueeze(0).to(device)
-        
+
         with torch.no_grad():
             outputs = model(x)
             probs = torch.softmax(outputs, dim=1)[0]
-            
+
         conf, idx = torch.max(probs, dim=0)
-        
+
         return {
-            "label": LABELS[idx.item()], 
-            "confidence": round(conf.item(), 4)
+            "label": LABELS[idx.item()],
+            "confidence": round(conf.item(), 4),
+            "probabilities": {LABELS[i]: round(p.item(), 4) for i, p in enumerate(probs)}
         }
+    except HTTPException:
+        raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Gagal memproses gambar: {str(e)}")
