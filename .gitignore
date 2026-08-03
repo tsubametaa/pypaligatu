@@ -1,13 +1,16 @@
-# Dependencies
-node_modules/
-.astro/
+# Dependencies (rekursif untuk subfolder seperti frontend/node_modules)
+**/node_modules/
+**/.astro/
 
 # Build Outputs
-dist/
+**/dist/
+**/.output/
 
-# Python
-__pycache__/
-*.pyc
+# Python Cache & Env
+**/__pycache__/
+**/*.pyc
+.venv/
+venv/
 
 # IDE & OS
 .vscode/
