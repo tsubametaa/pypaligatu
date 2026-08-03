@@ -1,0 +1,386 @@
+---
+// PredictCard.astro - Flat Color & Clean Professional AI Classifier Component with Lucide Icons
+import { Sparkles, Upload, RefreshCw, AlertCircle, Leaf, Recycle, AlertTriangle, CheckCircle2 } from 'lucide-astro';
+---
+
+<div class="w-full max-w-3xl mx-auto space-y-6">
+  <!-- Main Classifier Container -->
+  <div class="solid-card rounded-2xl p-5 sm:p-8 shadow-sm relative overflow-hidden transition-all duration-300">
+    <!-- Section Header -->
+    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-6 pb-4 border-b border-slate-200">
+      <div>
+        <h3 class="text-lg sm:text-xl font-bold text-teal-ink flex items-center gap-2">
+          Deteksi Kategori Sampah
+        </h3>
+        <p class="text-xs sm:text-sm text-slate-500 mt-0.5">Unggah foto atau pilih sampel gambar untuk dianalisis oleh AI</p>
+      </div>
+
+      <!-- Quick Preset Samples for Testing -->
+      <div class="flex items-center gap-1.5 self-stretch sm:self-auto overflow-x-auto pb-1 sm:pb-0 scrollbar-none">
+        <span class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider shrink-0 mr-1 hidden xs:inline">Coba Sampel:</span>
+        <button type="button" class="btn-sample px-2.5 py-1 text-xs font-semibold rounded-md bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200 transition-all shrink-0 active:scale-95 flex items-center gap-1.5" data-sample="organik">
+          <Leaf class="w-3.5 h-3.5 text-emerald-600" />
+          <span>Organik</span>
+        </button>
+        <button type="button" class="btn-sample px-2.5 py-1 text-xs font-semibold rounded-md bg-sky-50 text-sky-700 hover:bg-sky-100 border border-sky-200 transition-all shrink-0 active:scale-95 flex items-center gap-1.5" data-sample="anorganik">
+          <Recycle class="w-3.5 h-3.5 text-sky-600" />
+          <span>Anorganik</span>
+        </button>
+        <button type="button" class="btn-sample px-2.5 py-1 text-xs font-semibold rounded-md bg-rose-50 text-rose-700 hover:bg-rose-100 border border-rose-200 transition-all shrink-0 active:scale-95 flex items-center gap-1.5" data-sample="b3">
+          <AlertTriangle class="w-3.5 h-3.5 text-rose-600" />
+          <span>B3</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Drag & Drop Zone -->
+    <div id="drop-zone" class="relative group border-2 border-dashed border-slate-300 hover:border-teal rounded-xl p-6 sm:p-10 text-center transition-all duration-200 bg-slate-50 hover:bg-teal/5 cursor-pointer overflow-hidden">
+      <input type="file" id="file-input" accept="image/*" class="hidden" />
+
+      <!-- Scanning overlay -->
+      <div id="scan-overlay" class="hidden absolute inset-0 bg-teal-ink/20 backdrop-blur-[2px] z-20 flex items-center justify-center">
+        <div class="animate-scan"></div>
+        <div class="bg-teal-ink text-white px-4 py-2 rounded-lg text-xs font-bold flex items-center gap-2 shadow-lg border border-teal/40">
+          <div class="w-3.5 h-3.5 border-2 border-amber border-t-transparent rounded-full animate-spin"></div>
+          <span>Memindai Gambar...</span>
+        </div>
+      </div>
+
+      <!-- Default Upload State -->
+      <div id="upload-placeholder" class="flex flex-col items-center justify-center space-y-3 py-2">
+        <div class="w-14 h-14 sm:w-16 sm:h-16 rounded-xl bg-teal/10 text-teal flex items-center justify-center group-hover:bg-teal group-hover:text-white transition-all duration-200">
+          <Upload class="w-7 h-7 sm:w-8 sm:h-8" />
+        </div>
+        <div>
+          <p class="text-base sm:text-lg font-bold text-teal-ink group-hover:text-teal transition-colors">Tarik & Lepas Foto Sampah Di Sini</p>
+          <p class="text-xs sm:text-sm text-slate-500 mt-1">atau <span class="text-teal font-bold underline underline-offset-4">klik untuk pilih foto</span> (JPG, PNG, WEBP)</p>
+        </div>
+        <div class="text-[11px] text-slate-400 font-medium pt-1">
+          <span>Format didukung: Kamera HP / Galeri foto</span>
+        </div>
+      </div>
+
+      <!-- Preview Image State -->
+      <div id="upload-preview-container" class="hidden relative flex-col items-center justify-center py-2">
+        <div class="relative group/img max-w-md">
+          <img id="image-preview" src="" alt="Preview Sampah" class="max-h-56 sm:max-h-72 rounded-lg object-contain shadow-sm border border-slate-200" />
+          <div class="absolute inset-0 bg-slate-900/40 rounded-lg opacity-0 group-hover/img:opacity-100 transition-opacity flex items-center justify-center">
+            <button id="btn-change" type="button" class="px-3.5 py-1.5 text-xs font-bold text-slate-900 bg-white rounded-md shadow-md hover:bg-slate-100 transition-all active:scale-95 flex items-center gap-1.5">
+              <RefreshCw class="w-3.5 h-3.5" />
+              <span>Ganti Foto</span>
+            </button>
+          </div>
+        </div>
+        <p id="file-name" class="text-xs text-slate-500 font-mono truncate max-w-xs mt-3 bg-slate-100 px-3 py-1 rounded-md border border-slate-200"></p>
+      </div>
+    </div>
+
+    <!-- Action Bar -->
+    <div class="mt-5 sm:mt-6 flex flex-col sm:flex-row items-center gap-3">
+      <button
+        id="btn-analyze"
+        disabled
+        class="w-full py-3.5 sm:py-4 px-6 rounded-xl font-bold text-white bg-teal hover:bg-teal-deep disabled:bg-slate-300 disabled:cursor-not-allowed transition-all duration-200 shadow-md flex items-center justify-center gap-2 text-sm sm:text-base active:scale-[0.99]"
+      >
+        <Sparkles class="w-5 h-5 shrink-0 text-amber" />
+        <span id="btn-text">Analisis Sekarang</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Error Card -->
+  <div id="error-card" class="hidden bg-rose-50 border border-rose-200 rounded-xl p-5 text-rose-800 space-y-2">
+    <div class="flex items-center gap-3">
+      <div class="w-7 h-7 rounded-full bg-rose-100 flex items-center justify-center text-rose-600 font-bold shrink-0 text-sm">
+        <AlertCircle class="w-4 h-4" />
+      </div>
+      <h4 class="font-bold text-rose-900 text-sm sm:text-base">Gagal Menghubungi Server AI</h4>
+    </div>
+    <p id="error-text" class="text-xs sm:text-sm text-rose-700">Pastikan backend FastAPI sudah berjalan pada port 8000.</p>
+  </div>
+
+  <!-- Prediction Result Card -->
+  <div id="result-card" class="hidden solid-card border border-teal/20 rounded-2xl p-6 sm:p-8 shadow-md space-y-6 transition-all duration-300">
+    <!-- Result Header -->
+    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between pb-6 border-b border-slate-200 gap-4">
+      <div class="space-y-1">
+        <div class="flex items-center gap-2">
+          <span class="text-[10px] sm:text-xs uppercase tracking-wider font-extrabold text-amber bg-amber/10 px-2.5 py-0.5 rounded border border-amber/20">
+            Hasil Klasifikasi AI
+          </span>
+        </div>
+        <h3 id="result-label" class="text-3xl sm:text-4xl font-black text-teal-ink tracking-tight flex items-center gap-3 mt-1">
+          ORGANIK
+        </h3>
+        <p id="result-desc" class="text-xs sm:text-sm text-slate-600 leading-relaxed max-w-md">Sampah sisa makanan dan bahan organik mudah terurai.</p>
+      </div>
+
+      <!-- Confidence Box -->
+      <div class="w-full sm:w-auto flex items-center justify-between sm:flex-col sm:items-end bg-slate-50 p-4 rounded-xl border border-slate-200 min-w-[160px]">
+        <span class="text-xs text-slate-500 font-bold uppercase tracking-wider">Akurasi Keyakinan</span>
+        <span id="result-confidence" class="text-3xl sm:text-4xl font-black text-teal tracking-tight">98.5%</span>
+      </div>
+    </div>
+
+    <!-- Probability Breakdown Bars -->
+    <div class="space-y-4">
+      <h4 class="text-xs sm:text-sm font-bold text-teal-ink uppercase tracking-wider">
+        Distribusi Probabilitas Model
+      </h4>
+      
+      <!-- Organik Bar -->
+      <div class="space-y-1.5 bg-slate-50 p-3 rounded-lg border border-slate-200">
+        <div class="flex justify-between text-xs font-bold">
+          <span class="text-emerald-700 flex items-center gap-1.5">
+            <Leaf class="w-3.5 h-3.5" />
+            <span>ORGANIK</span>
+          </span>
+          <span id="prob-organik-val" class="text-slate-700 font-mono">0%</span>
+        </div>
+        <div class="w-full h-3 bg-slate-200 rounded-full overflow-hidden">
+          <div id="prob-organik-bar" class="h-full bg-emerald-600 rounded-full transition-all duration-500" style="width: 0%"></div>
+        </div>
+      </div>
+
+      <!-- Anorganik Bar -->
+      <div class="space-y-1.5 bg-slate-50 p-3 rounded-lg border border-slate-200">
+        <div class="flex justify-between text-xs font-bold">
+          <span class="text-sky-700 flex items-center gap-1.5">
+            <Recycle class="w-3.5 h-3.5" />
+            <span>ANORGANIK</span>
+          </span>
+          <span id="prob-anorganik-val" class="text-slate-700 font-mono">0%</span>
+        </div>
+        <div class="w-full h-3 bg-slate-200 rounded-full overflow-hidden">
+          <div id="prob-anorganik-bar" class="h-full bg-sky-600 rounded-full transition-all duration-500" style="width: 0%"></div>
+        </div>
+      </div>
+
+      <!-- B3 Bar -->
+      <div class="space-y-1.5 bg-slate-50 p-3 rounded-lg border border-slate-200">
+        <div class="flex justify-between text-xs font-bold">
+          <span class="text-rose-700 flex items-center gap-1.5">
+            <AlertTriangle class="w-3.5 h-3.5" />
+            <span>B3 (Berbahaya & Beracun)</span>
+          </span>
+          <span id="prob-b3-val" class="text-slate-700 font-mono">0%</span>
+        </div>
+        <div class="w-full h-3 bg-slate-200 rounded-full overflow-hidden">
+          <div id="prob-b3-bar" class="h-full bg-rose-600 rounded-full transition-all duration-500" style="width: 0%"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Actionable Recycling Tips Box -->
+    <div id="tips-box" class="p-4 sm:p-5 rounded-xl bg-teal/5 border border-teal/20 text-xs sm:text-sm text-teal-ink space-y-1.5">
+      <p class="font-bold text-teal flex items-center gap-1.5">
+        <CheckCircle2 class="w-4 h-4" />
+        <span>Rekomendasi Pengelolaan:</span>
+      </p>
+      <p id="tips-text" class="text-slate-700 leading-relaxed">Pisahkan dari sampah lain dan tempatkan di wadah pengomposan.</p>
+    </div>
+
+    <!-- Reset / Test another photo button -->
+    <div class="pt-2 flex justify-center">
+      <button id="btn-reset-test" type="button" class="px-5 py-2.5 text-xs font-bold text-teal hover:text-teal-deep bg-slate-100 hover:bg-slate-200 border border-slate-200 rounded-lg transition-all active:scale-95 flex items-center gap-1.5">
+        <RefreshCw class="w-3.5 h-3.5" />
+        <span>Uji Gambar Lain</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+  let selectedFile: File | null = null;
+
+  const dropZone = document.getElementById('drop-zone') as HTMLDivElement;
+  const fileInput = document.getElementById('file-input') as HTMLInputElement;
+  const uploadPlaceholder = document.getElementById('upload-placeholder') as HTMLDivElement;
+  const uploadPreviewContainer = document.getElementById('upload-preview-container') as HTMLDivElement;
+  const imagePreview = document.getElementById('image-preview') as HTMLImageElement;
+  const fileName = document.getElementById('file-name') as HTMLParagraphElement;
+  const btnChange = document.getElementById('btn-change') as HTMLButtonElement;
+  const btnAnalyze = document.getElementById('btn-analyze') as HTMLButtonElement;
+  const scanOverlay = document.getElementById('scan-overlay') as HTMLDivElement;
+  
+  const errorCard = document.getElementById('error-card') as HTMLDivElement;
+  const errorText = document.getElementById('error-text') as HTMLParagraphElement;
+  const resultCard = document.getElementById('result-card') as HTMLDivElement;
+  const btnResetTest = document.getElementById('btn-reset-test') as HTMLButtonElement;
+
+  const resultLabel = document.getElementById('result-label') as HTMLHeadingElement;
+  const resultDesc = document.getElementById('result-desc') as HTMLParagraphElement;
+  const resultConfidence = document.getElementById('result-confidence') as HTMLSpanElement;
+
+  const probOrganikVal = document.getElementById('prob-organik-val') as HTMLSpanElement;
+  const probOrganikBar = document.getElementById('prob-organik-bar') as HTMLDivElement;
+  const probAnorganikVal = document.getElementById('prob-anorganik-val') as HTMLSpanElement;
+  const probAnorganikBar = document.getElementById('prob-anorganik-bar') as HTMLDivElement;
+  const probB3Val = document.getElementById('prob-b3-val') as HTMLSpanElement;
+  const probB3Bar = document.getElementById('prob-b3-bar') as HTMLDivElement;
+  const tipsText = document.getElementById('tips-text') as HTMLParagraphElement;
+
+  // Preset Sample SVG Images (Data URLs) for instant testing
+  const sampleImages: Record<string, string> = {
+    organik: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="400" height="300" viewBox="0 0 400 300"><rect width="100%" height="100%" fill="%23ecfdf5"/><path d="M200,60 C120,60 80,140 80,220 C140,220 200,200 200,200 C200,200 260,220 320,220 C320,140 280,60 200,60 Z" fill="%2310b981"/><path d="M200,60 L200,200" stroke="%23047857" stroke-width="6"/></svg>',
+    anorganik: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="400" height="300" viewBox="0 0 400 300"><rect width="100%" height="100%" fill="%23f0f9ff"/><rect x="150" y="80" width="100" height="180" rx="20" fill="%230284c7"/><rect x="175" y="40" width="50" height="40" rx="5" fill="%230369a1"/></svg>',
+    b3: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="400" height="300" viewBox="0 0 400 300"><rect width="100%" height="100%" fill="%23fff1f2"/><rect x="160" y="60" width="80" height="180" rx="10" fill="%23f43f5e"/><rect x="180" y="40" width="40" height="20" rx="4" fill="%23be123c"/><text x="188" y="165" font-family="sans-serif" font-size="36" font-weight="bold" fill="white">+</text></svg>'
+  };
+
+  // Category Information Details
+  const categoryDetails: Record<string, { desc: string; tips: string }> = {
+    ORGANIK: {
+      desc: 'Sampah sisa makanan, dedaunan, kayu, dan materi biologis alami yang dapat terurai secara biologis.',
+      tips: 'Cacah sampah dan masukkan ke lubang biopori atau tong komposter untuk diolah menjadi pupuk organik.'
+    },
+    ANORGANIK: {
+      desc: 'Sampah berbahan sintetis seperti plastik, botol kaca, kaleng aluminium, kertas, dan kardus.',
+      tips: 'Bersihkan sisa isi, keringkan, lalu pilah untuk disetorkan ke Bank Sampah terdekat atau tempat daur ulang.'
+    },
+    B3: {
+      desc: 'Bahan Berbahaya dan Beracun meliputi baterai bekas, lampu neon, botol pestisida, dan limbah kimia.',
+      tips: 'Kumpulkan dalam wadah terpisah yang aman dan kirimkan ke tempat penampungan limbah B3.'
+    }
+  };
+
+  // Preset Sample Click Handlers
+  document.querySelectorAll('.btn-sample').forEach((btn) => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const sampleKey = (btn as HTMLButtonElement).dataset.sample;
+      if (sampleKey && sampleImages[sampleKey]) {
+        fetch(sampleImages[sampleKey])
+          .then((res) => res.blob())
+          .then((blob) => {
+            const file = new File([blob], `sampel_${sampleKey}.png`, { type: 'image/png' });
+            handleFile(file);
+          });
+      }
+    });
+  });
+
+  // Drag and drop listeners
+  dropZone.addEventListener('click', () => fileInput.click());
+  btnChange.addEventListener('click', (e) => {
+    e.stopPropagation();
+    fileInput.click();
+  });
+
+  btnResetTest.addEventListener('click', () => {
+    resultCard.classList.add('hidden');
+    uploadPlaceholder.classList.remove('hidden');
+    uploadPreviewContainer.classList.add('hidden');
+    uploadPreviewContainer.classList.remove('flex');
+    btnAnalyze.disabled = true;
+    selectedFile = null;
+    fileInput.value = '';
+  });
+
+  dropZone.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    dropZone.classList.add('border-teal', 'bg-teal/5');
+  });
+
+  dropZone.addEventListener('dragleave', () => {
+    dropZone.classList.remove('border-teal', 'bg-teal/5');
+  });
+
+  dropZone.addEventListener('drop', (e) => {
+    e.preventDefault();
+    dropZone.classList.remove('border-teal', 'bg-teal/5');
+    if (e.dataTransfer?.files.length) {
+      handleFile(e.dataTransfer.files[0]);
+    }
+  });
+
+  fileInput.addEventListener('change', () => {
+    if (fileInput.files?.length) {
+      handleFile(fileInput.files[0]);
+    }
+  });
+
+  function handleFile(file: File) {
+    if (!file.type.startsWith('image/')) {
+      alert('Harap pilih file gambar (JPG, PNG, WEBP, dll).');
+      return;
+    }
+    selectedFile = file;
+    fileName.textContent = file.name;
+    
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      imagePreview.src = e.target?.result as string;
+      uploadPlaceholder.classList.add('hidden');
+      uploadPreviewContainer.classList.remove('hidden');
+      uploadPreviewContainer.classList.add('flex');
+      btnAnalyze.disabled = false;
+      resultCard.classList.add('hidden');
+      errorCard.classList.add('hidden');
+    };
+    reader.readAsDataURL(file);
+  }
+
+  btnAnalyze.addEventListener('click', async () => {
+    if (!selectedFile) return;
+
+    scanOverlay.classList.remove('hidden');
+    resultCard.classList.add('hidden');
+    errorCard.classList.add('hidden');
+    btnAnalyze.disabled = true;
+
+    const formData = new FormData();
+    formData.append('file', selectedFile);
+
+    try {
+      const response = await fetch('/api/predict', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => null);
+        throw new Error(errorData?.detail || `Error (${response.status})`);
+      }
+
+      const data = await response.json();
+      displayResult(data);
+    } catch (err: any) {
+      errorText.textContent = err.message || 'Gagal terhubung ke server backend Paligatu AI.';
+      errorCard.classList.remove('hidden');
+    } finally {
+      scanOverlay.classList.add('hidden');
+      btnAnalyze.disabled = false;
+    }
+  });
+
+  function displayResult(data: { label: string; confidence: number; probabilities: Record<string, number> }) {
+    const label = data.label.toUpperCase();
+    resultLabel.textContent = label;
+    resultConfidence.textContent = `${(data.confidence * 100).toFixed(1)}%`;
+
+    const info = categoryDetails[label] || {
+      desc: 'Kategori sampah teridentifikasi oleh sistem AI.',
+      tips: 'Kelola sampah sesuai petunjuk jenis kategorinya.'
+    };
+
+    resultDesc.textContent = info.desc;
+    tipsText.textContent = info.tips;
+
+    const probs = data.probabilities || {};
+    const orgProb = (probs['ORGANIK'] || 0) * 100;
+    const anorgProb = (probs['ANORGANIK'] || 0) * 100;
+    const b3Prob = (probs['B3'] || 0) * 100;
+
+    probOrganikVal.textContent = `${orgProb.toFixed(1)}%`;
+    probOrganikBar.style.width = `${orgProb}%`;
+
+    probAnorganikVal.textContent = `${anorgProb.toFixed(1)}%`;
+    probAnorganikBar.style.width = `${anorgProb}%`;
+
+    probB3Val.textContent = `${b3Prob.toFixed(1)}%`;
+    probB3Bar.style.width = `${b3Prob}%`;
+
+    resultCard.classList.remove('hidden');
+    resultCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+</script>

@@ -1,0 +1,207 @@
+---
+import PredictCard from "./PredictCard.astro";
+import { Leaf, Recycle, AlertTriangle } from "lucide-astro";
+---
+
+<div
+  class="min-h-screen flex flex-col justify-between bg-base relative selection:bg-amber selection:text-white"
+>
+  <!-- Navbar Header -->
+  <header class="solid-nav border-b border-slate-200 sticky top-0 z-50">
+    <div
+      class="max-w-6xl mx-auto px-4 sm:px-6 h-16 sm:h-20 flex items-center justify-between gap-3"
+    >
+      <!-- Logo & Brand -->
+      <div class="flex items-center gap-3">
+        <div
+          class="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-teal flex items-center justify-center text-white font-extrabold text-xl shadow-sm shrink-0"
+        >
+          P
+        </div>
+        <div>
+          <h1
+            class="font-extrabold text-lg sm:text-xl text-teal-ink tracking-tight flex items-center gap-2"
+          >
+            Paligatu <span
+              class="text-amber bg-amber/10 text-[10px] sm:text-xs px-2 py-0.5 rounded-md uppercase tracking-wider font-bold border border-amber/20"
+              >AI</span
+            >
+          </h1>
+          <p class="text-xs text-slate-500 hidden sm:block font-medium">
+            Pahlawan Lingkungan Tigasatu
+          </p>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content Hero Section -->
+  <main
+    class="flex-1 max-w-6xl w-full mx-auto px-4 sm:px-6 py-8 sm:py-16 space-y-10 sm:space-y-16"
+  >
+    <!-- Hero Title Header -->
+    <div class="text-center max-w-3xl mx-auto space-y-4">
+      <h2
+        class="text-3xl sm:text-5xl font-black text-teal-ink tracking-tight leading-tight"
+      >
+        Klasifikasi Sampah Cerdas dengan <span
+          class="text-teal underline decoration-amber decoration-4 underline-offset-4"
+          >Kecerdasan Buatan</span
+        >
+      </h2>
+
+      <p
+        class="text-sm sm:text-lg text-slate-600 leading-relaxed max-w-2xl mx-auto font-normal"
+      >
+        Unggah foto sampah Anda dan biarkan teknologi Visi Komputer
+        mengidentifikasi kategori <strong class="text-emerald-700 font-bold"
+          >Organik</strong
+        >, <strong class="text-sky-700 font-bold">Anorganik</strong>, atau <strong
+          class="text-rose-700 font-bold">B3</strong
+        > secara instan.
+      </p>
+
+      <!-- Stats Metrics Bar -->
+      <div
+        class="pt-2 flex flex-wrap items-center justify-center gap-3 sm:gap-6 text-slate-600 text-xs sm:text-sm font-semibold"
+      >
+        <div
+          class="flex items-center gap-2 bg-white px-3.5 py-1.5 rounded-lg border border-slate-200 shadow-sm"
+        >
+          <span class="text-teal font-bold">99.2%</span> Akurasi Model
+        </div>
+        <div
+          class="flex items-center gap-2 bg-white px-3.5 py-1.5 rounded-lg border border-slate-200 shadow-sm"
+        >
+          <span class="text-amber font-bold">&lt;100ms</span> Waktu Analisis
+        </div>
+        <div
+          class="flex items-center gap-2 bg-white px-3.5 py-1.5 rounded-lg border border-slate-200 shadow-sm"
+        >
+          <span class="text-emerald-700 font-bold">3 Kategori</span> Sampah Utama
+        </div>
+      </div>
+    </div>
+
+    <!-- Predict Machine Component -->
+    <PredictCard />
+
+    <!-- Feature Highlights Knowledge Hub -->
+    <div class="space-y-6 pt-6">
+      <div class="text-center max-w-md mx-auto space-y-1">
+        <h3 class="text-xl sm:text-2xl font-bold text-teal-ink">
+          Panduan Kategori Sampah
+        </h3>
+        <p class="text-xs sm:text-sm text-slate-500">
+          Kenali karakteristik dan pengolahan tiap jenis limbah
+        </p>
+      </div>
+
+      <div
+        class="grid grid-cols-1 md:grid-cols-3 gap-5 sm:gap-6 max-w-5xl mx-auto"
+      >
+        <!-- Organik Card -->
+        <div
+          class="bg-white p-6 rounded-xl border border-slate-200 hover:border-emerald-500 transition-all duration-200 shadow-sm"
+        >
+          <div
+            class="w-12 h-12 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center font-bold mb-4"
+          >
+            <Leaf class="w-6 h-6 text-emerald-700" />
+          </div>
+          <span
+            class="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded bg-emerald-100 text-emerald-800"
+            >Dapat Terurai</span
+          >
+          <h4 class="font-bold text-teal-ink text-lg mt-2">Sampah Organik</h4>
+          <p class="text-xs text-slate-600 mt-2 leading-relaxed">
+            Sisa makanan, dedaunan gugur, ranting pohon, dan bahan alami
+            biologis yang dapat dikomposkan alami.
+          </p>
+          <div
+            class="mt-4 pt-3 border-t border-slate-100 text-[11px] font-bold text-emerald-700 flex items-center justify-between"
+          >
+            <span>Solusi: Komposter / Biopori</span>
+            <span>Organik</span>
+          </div>
+        </div>
+
+        <!-- Anorganik Card -->
+        <div
+          class="bg-white p-6 rounded-xl border border-slate-200 hover:border-sky-500 transition-all duration-200 shadow-sm"
+        >
+          <div
+            class="w-12 h-12 rounded-lg bg-sky-50 text-sky-700 flex items-center justify-center font-bold mb-4"
+          >
+            <Recycle class="w-6 h-6 text-sky-700" />
+          </div>
+          <span
+            class="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded bg-sky-100 text-sky-800"
+            >Daur Ulang</span
+          >
+          <h4 class="font-bold text-teal-ink text-lg mt-2">Sampah Anorganik</h4>
+          <p class="text-xs text-slate-600 mt-2 leading-relaxed">
+            Botol plastik, kaca, kaleng alumunium, kertas, kardus, dan barang
+            buatan pabrik yang sulit terurai tanah.
+          </p>
+          <div
+            class="mt-4 pt-3 border-t border-slate-100 text-[11px] font-bold text-sky-700 flex items-center justify-between"
+          >
+            <span>Solusi: Bank Sampah</span>
+            <span>Recyclable</span>
+          </div>
+        </div>
+
+        <!-- B3 Card -->
+        <div
+          class="bg-white p-6 rounded-xl border border-slate-200 hover:border-rose-500 transition-all duration-200 shadow-sm"
+        >
+          <div
+            class="w-12 h-12 rounded-lg bg-rose-50 text-rose-700 flex items-center justify-center font-bold mb-4"
+          >
+            <AlertTriangle class="w-6 h-6 text-rose-700" />
+          </div>
+          <span
+            class="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded bg-rose-100 text-rose-800"
+            >Limbah Khusus</span
+          >
+          <h4 class="font-bold text-teal-ink text-lg mt-2">Limbah B3</h4>
+          <p class="text-xs text-slate-600 mt-2 leading-relaxed">
+            Baterai bekas, lampu neon, botol racun serangga, wadah deterjen, dan
+            produk mengandung zat beracun.
+          </p>
+          <div
+            class="mt-4 pt-3 border-t border-slate-100 text-[11px] font-bold text-rose-700 flex items-center justify-between"
+          >
+            <span>Solusi: Drop Point B3</span>
+            <span>Berbahaya</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="border-t border-slate-200 bg-white py-6 mt-12">
+    <div
+      class="max-w-6xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-500"
+    >
+      <div class="flex items-center gap-2">
+        <div
+          class="w-6 h-6 rounded bg-teal flex items-center justify-center text-white font-bold text-xs"
+        >
+          P
+        </div>
+        <span class="font-bold text-teal-ink">Paligatu AI Platform</span>
+      </div>
+      <p>
+        © {new Date().getFullYear()} SMKN 31 Jakarta
+      </p>
+      <div class="flex items-center gap-3 text-slate-400">
+        <span>PyTorch EfficientNet-B0</span>
+        <span>•</span>
+        <span>Astro & FastAPI</span>
+      </div>
+    </div>
+  </footer>
+</div>

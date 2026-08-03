@@ -1,0 +1,55 @@
+@import "tailwindcss";
+
+@theme {
+  --color-base: #FAFAFA;
+  --color-teal: #0F766E;
+  --color-teal-deep: #0B5952;
+  --color-teal-ink: #0A2E2B;
+  --color-amber: #F59E0B;
+  --color-amber-soft: #FBBF24;
+}
+
+/* Custom Base & Solid Styles */
+@layer base {
+  body {
+    background-color: var(--color-base);
+    color: var(--color-teal-ink);
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+}
+
+/* Clean Solid Card & Navbar Styling */
+.solid-card {
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+}
+
+.solid-nav {
+  background-color: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+/* Scanning Line Animation */
+@keyframes scan-beam {
+  0% {
+    top: 0%;
+    opacity: 0.9;
+  }
+  100% {
+    top: 100%;
+    opacity: 0.9;
+  }
+}
+
+.animate-scan {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background-color: #0F766E;
+  box-shadow: 0 0 8px #0F766E;
+  animation: scan-beam 1.8s ease-in-out infinite alternate;
+}

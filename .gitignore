@@ -1,4 +1,15 @@
+# Dependencies
+node_modules/
+.astro/
+
+# Build Outputs
+dist/
+
+# Python
 __pycache__/
-*.py[cod]
-*$py.class
-Paligatu_AI.ipynb
+*.pyc
+
+# IDE & OS
+.vscode/
+.idea/
+.DS_Store
